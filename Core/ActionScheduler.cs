@@ -4,7 +4,7 @@ namespace GJ2025.Core
 {
     public class ActionScheduler : MonoBehaviour
     {
-        IAction currentAction;
+        private IAction currentAction;
 
         public void StartAction(IAction action)
         {

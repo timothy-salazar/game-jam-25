@@ -1,34 +1,37 @@
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+namespace GJ2025.Control
 {
-    public float moveSpeed = 200f;
-    public float zoomSpeed = 20f;
-    public float minZoom = 20f;
-    public float maxZoom = 60f;
-
-    void Update()
+    public class CameraController : MonoBehaviour
     {
-        Pan();
-        Zoom();
-    }
+        public float moveSpeed = 200f;
+        public float zoomSpeed = 20f;
+        public float minZoom = 20f;
+        public float maxZoom = 60f;
 
-    private void Pan()
-    {
-        // WASD Movement
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
+        void Update()
+        {
+            Pan();
+            Zoom();
+        }
 
-        Vector3 moveDirection = new Vector3(horizontalInput, 0f, verticalInput).normalized;
-        Vector3 targetPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime / 2;
-        transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * moveSpeed);
-    }
+        private void Pan()
+        {
+            // WASD Movement
+            float horizontalInput = Input.GetAxis("Horizontal");
+            float verticalInput = Input.GetAxis("Vertical");
 
-    private void Zoom()
-    {
-        float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+            Vector3 moveDirection = new Vector3(horizontalInput, 0f, verticalInput).normalized;
+            Vector3 targetPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime / 2;
+            transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * moveSpeed);
+        }
 
-        Camera.main.fieldOfView -= scrollInput * zoomSpeed;
-        Camera.main.fieldOfView = Mathf.Clamp(Camera.main.fieldOfView, minZoom, maxZoom);
+        private void Zoom()
+        {
+            float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+
+            Camera.main.fieldOfView -= scrollInput * zoomSpeed;
+            Camera.main.fieldOfView = Mathf.Clamp(Camera.main.fieldOfView, minZoom, maxZoom);
+        }
     }
 }

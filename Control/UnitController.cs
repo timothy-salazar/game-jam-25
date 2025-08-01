@@ -6,6 +6,9 @@ using GJ2025.Movement;
 
 namespace GJ2025.Control
 {
+    [RequireComponent(typeof(Mover))]
+    [RequireComponent(typeof(Interacter))]
+
     public class UnitController : MonoBehaviour
     {
         [SerializeField] bool isSelected;

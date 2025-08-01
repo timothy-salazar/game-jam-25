@@ -1,17 +1,14 @@
 using UnityEngine;
 using GJ2025.Core;
-using GJ2025.Movement;
 
 namespace GJ2025.Control
 {
     public class GameController : MonoBehaviour
     {
-        private Mover mover;
         [SerializeField] UnitController selectedUnit;
 
         void Start()
         {
-            mover = GetComponent<Mover>();
         }
 
         void Update()

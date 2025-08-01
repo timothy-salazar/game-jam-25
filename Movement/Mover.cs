@@ -4,6 +4,8 @@ using GJ2025.Core;
 
 namespace GJ2025.Movement
 {
+    [RequireComponent(typeof(ActionScheduler))]
+
     public class Mover : MonoBehaviour, IAction
     {
         private NavMeshAgent agent;
@@ -11,7 +13,6 @@ namespace GJ2025.Movement
         private ActionScheduler scheduler;
 
         private float speed = 0;
-
 
         void Start()
         {

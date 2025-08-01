@@ -1,17 +1,22 @@
 using UnityEngine;
 using GJ2025.Core;
 using GJ2025.Movement;
+using Unity.VisualScripting;
+using NUnit.Framework;
 
 namespace GJ2025.Interaction
 {
+    [RequireComponent(typeof(Mover))]
+    [RequireComponent(typeof(ActionScheduler))]
+
     public class Interacter : MonoBehaviour, IAction
     {
         private Mover mover;
         private Animator animator;
         private ActionScheduler scheduler;
 
-        private Transform target;
-        [SerializeField] float range = 1f;
+        private InteractTarget target;
+        [SerializeField] float range = 3f;
 
         void Start()
         {
@@ -22,41 +27,52 @@ namespace GJ2025.Interaction
 
         void Update()
         {
-            if (target != null)
-            {
-                mover.MoveTo(target.position);
+            if (target == null) return;
 
-                if (IsInRange())
-                {
-                    mover.Cancel();
-                    InteractBehavior();
-                }
+            mover.MoveTo(target.transform.position);
+
+            if (IsInRange())
+            {
+                mover.Cancel();
+                InteractBehavior();
             }
         }
 
         public void Interact(InteractTarget interactTarget)
         {
             scheduler.StartAction(this);
-            target = interactTarget.transform;
+            target = interactTarget;
         }
 
         public void Cancel()
         {
             target.GetComponent<MeshRenderer>().enabled = true;
+            target.Cancel();
             target = null;
             StopInteract();
         }
 
-        private bool IsInRange()
-        {
-            return Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(target.position.x, 0, target.position.z)) <= range;
-        }
-
         private void InteractBehavior()
         {
-            transform.LookAt(new Vector3(target.position.x, transform.position.y, target.position.z));
+            Vector3 interactPoint = target.transform.position + target.Direction();
+            transform.LookAt(new Vector3(interactPoint.x, transform.position.y, interactPoint.z));
             target.GetComponent<MeshRenderer>().enabled = false;
             TriggerInteract();
+
+            if (target.IsComplete())
+            {
+                scheduler.StartAction(null);
+            }
+            else
+            {
+                target.StartTimer();
+            }
+        }
+
+        private bool IsInRange()
+        {
+            Transform targetTransform = target.transform;
+            return Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(targetTransform.position.x, 0, targetTransform.position.z)) <= range;
         }
 
         private void TriggerInteract()
