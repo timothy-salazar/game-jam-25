@@ -44,7 +44,7 @@ namespace GJ2025.Interaction
         {
             target.GetComponent<MeshRenderer>().enabled = true;
             target = null;
-            animator.ResetTrigger("interact");
+            StopInteract();
         }
 
         private bool IsInRange()
@@ -54,8 +54,21 @@ namespace GJ2025.Interaction
 
         private void InteractBehavior()
         {
+            transform.LookAt(new Vector3(target.position.x, transform.position.y, target.position.z));
             target.GetComponent<MeshRenderer>().enabled = false;
+            TriggerInteract();
+        }
+
+        private void TriggerInteract()
+        {
             animator.SetTrigger("interact");
+            animator.ResetTrigger("stopInteract");
+        }
+
+        private void StopInteract()
+        {
+            animator.SetTrigger("stopInteract");
+            animator.ResetTrigger("interact");
         }
     }
 }
