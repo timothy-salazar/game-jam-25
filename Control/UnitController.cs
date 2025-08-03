@@ -11,19 +11,26 @@ namespace GJ2025.Control
 
     public class UnitController : MonoBehaviour
     {
-        [SerializeField] bool isSelected;
+        [SerializeField] bool isSelected = false;
+        [SerializeField] bool isSelectable = false;
 
         private Interacter interacter;
         private Mover mover;
 
-        void Start()
+        private void OnEnable()
+        {
+            Helpers.OnUnitUnlock.AddListener(UnlockUnit);
+        }
+
+        void OnDisable()
+        {
+            Helpers.OnUnitUnlock.RemoveListener(UnlockUnit);
+        }
+
+        private void Start()
         {
             mover = GetComponent<Mover>();
             interacter = GetComponent<Interacter>();
-        }
-
-        void Update()
-        {
 
         }
 
@@ -37,7 +44,7 @@ namespace GJ2025.Control
 
                 if (target != null)
                 {
-                    if (Input.GetMouseButtonDown(0))
+                    if (interacter.CanInteract(target))
                     {
                         interacter.Interact(target);
                     }
@@ -58,10 +65,7 @@ namespace GJ2025.Control
                 TerrainCollider terrain = hit.transform.GetComponent<TerrainCollider>();
                 if (terrain != null && NavMesh.CalculatePath(transform.position, hit.point, NavMesh.AllAreas, new NavMeshPath()))
                 {
-                    if (Input.GetMouseButton(0))
-                    {
-                        mover.StartMoveAction(hit.point);
-                    }
+                    mover.StartMoveAction(hit.point);
 
                     return true;
                 }
@@ -70,7 +74,15 @@ namespace GJ2025.Control
             return false;
         }
 
-        public bool GetIsSelected()
+        private void UnlockUnit(string unitTag)
+        {
+            if (tag == unitTag)
+            {
+                SetIsSelectable(true);
+            }
+        }
+
+        public bool IsSelected()
         {
             return isSelected;
         }
@@ -78,6 +90,16 @@ namespace GJ2025.Control
         public void SetIsSelected(bool newValue)
         {
             isSelected = newValue;
+        }
+
+        public bool IsSelectable()
+        {
+            return isSelectable;
+        }
+
+        public void SetIsSelectable(bool newValue)
+        {
+            isSelectable = newValue;
         }
     }
 }

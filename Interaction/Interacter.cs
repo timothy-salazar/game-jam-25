@@ -1,8 +1,6 @@
 using UnityEngine;
 using GJ2025.Core;
 using GJ2025.Movement;
-using Unity.VisualScripting;
-using NUnit.Framework;
 
 namespace GJ2025.Interaction
 {
@@ -11,12 +9,14 @@ namespace GJ2025.Interaction
 
     public class Interacter : MonoBehaviour, IAction
     {
+        [SerializeField] float range = 3f;
+        [SerializeField] Ingredient ingredient;
+
         private Mover mover;
         private Animator animator;
         private ActionScheduler scheduler;
 
         private InteractTarget target;
-        [SerializeField] float range = 3f;
 
         void Start()
         {
@@ -40,32 +40,44 @@ namespace GJ2025.Interaction
 
         public void Interact(InteractTarget interactTarget)
         {
-            scheduler.StartAction(this);
+            scheduler.StartAction(this, interactTarget.gameObject);
             target = interactTarget;
         }
 
         public void Cancel()
         {
-            target.GetComponent<MeshRenderer>().enabled = true;
             target.Cancel();
             target = null;
             StopInteract();
+        }
+
+        public bool CanInteract(InteractTarget interactTarget)
+        {
+            if (interactTarget.IsBottomless())
+            {
+                return Ingredient() != null;
+            }
+
+            IngredientStorage[] neededIngredients = interactTarget.NeededIngredients();
+            if (neededIngredients.Length > 0 && !interactTarget.HaveAllIngredients())
+            {
+                return System.Array.Find(neededIngredients, neededIngredient => neededIngredient.ingredient == Ingredient()).ingredient != null;
+            }
+            else
+            {
+                return Ingredient() == null;
+            }
         }
 
         private void InteractBehavior()
         {
             Vector3 interactPoint = target.transform.position + target.Direction();
             transform.LookAt(new Vector3(interactPoint.x, transform.position.y, interactPoint.z));
-            target.GetComponent<MeshRenderer>().enabled = false;
             TriggerInteract();
 
-            if (target.IsComplete())
+            if (!target.IsComplete())
             {
-                scheduler.StartAction(null);
-            }
-            else
-            {
-                target.StartTimer();
+                target.StartInteraction(this);
             }
         }
 
@@ -85,6 +97,16 @@ namespace GJ2025.Interaction
         {
             animator.SetTrigger("stopInteract");
             animator.ResetTrigger("interact");
+        }
+
+        public Ingredient Ingredient()
+        {
+            return ingredient;
+        }
+
+        public void SetIngredient(Ingredient newValue)
+        {
+            ingredient = newValue;
         }
     }
 }

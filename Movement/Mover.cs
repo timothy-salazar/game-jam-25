@@ -28,7 +28,7 @@ namespace GJ2025.Movement
 
         public void StartMoveAction(Vector3 destination)
         {
-            scheduler.StartAction(this);
+            scheduler.StartAction(this, gameObject);
             MoveTo(destination);
         }
 

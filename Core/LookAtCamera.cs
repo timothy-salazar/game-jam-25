@@ -6,7 +6,9 @@ namespace GJ2025.Core
     {
         void LateUpdate()
         {
-            transform.LookAt(Camera.main.transform);
+            float targetXRotation = Camera.main.transform.rotation.eulerAngles.x;
+            Vector3 newRotation = new Vector3(targetXRotation, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+            transform.rotation = Quaternion.Euler(newRotation);
         }
     }
 }
